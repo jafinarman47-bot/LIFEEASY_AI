@@ -25,24 +25,27 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Recreate Modern Android v2 Structure
+      - name: Recreate Modern Android v2 Structure & Fix Assets
         run: |
           rm -rf android
           flutter create . --org com.lifeeasy --project-name lifeeasy_ai --platforms android
           sed -i 's/<uses-permission android:name="android.permission.INTERNET"\/>//g' android/app/src/main/AndroidManifest.xml
           sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/>\n    <application/' android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label="lifeeasy_ai"/android:label="LifeEasy AI"/g' android/app/src/main/AndroidManifest.xml
+          
+          # মিসিং অ্যাসেটস ফোল্ডার তৈরি করা যাতে অ্যাসেট এরর না আসে
+          mkdir -p assets/icons
 
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Completely Fix speech_to_text build.gradle
+      - name: Correctly Patch speech_to_text plugin
         run: |
           STT_GRADLE="$HOME/.pub-cache/hosted/pub.dev/speech_to_text-7.4.0/android/build.gradle"
           if [ -f "$STT_GRADLE" ]; then
-            echo "Rewriting speech_to_text build.gradle completely..."
-            printf "group 'com.surialagan.speechtotext'\nversion '1.0-SNAPSHOT'\n\nbuildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n        classpath 'com.android.tools.build:gradle:8.1.0'\n    }\n}\n\nallprojects {\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\n\napply plugin: 'com.android.library'\n\nandroid {\n    namespace 'com.surialagan.speechtotext'\n    compileSdk 34\n\n    defaultConfig {\n        minSdk 21\n        targetSdk 34\n    }\n    lintOptions {\n        disable 'InvalidPackage'\n    }\n}\n" > "$STT_GRADLE"
-            echo "speech_to_text successfully patched!"
+            echo "Patching speech_to_text with correct package namespace..."
+            printf "group 'com.csdcorp.speech_to_text'\nversion '1.0-SNAPSHOT'\n\nbuildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n        classpath 'com.android.tools.build:gradle:8.1.0'\n    }\n}\n\nallprojects {\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\n\napply plugin: 'com.android.library'\n\nandroid {\n    namespace 'com.csdcorp.speech_to_text'\n    compileSdk 34\n\n    defaultConfig {\n        minSdk 21\n        targetSdk 34\n    }\n    lintOptions {\n        disable 'InvalidPackage'\n    }\n}\n" > "$STT_GRADLE"
+            echo "speech_to_text successfully patched with com.csdcorp.speech_to_text!"
           else
             echo "Warning: speech_to_text build.gradle not found, but continuing..."
           fi
