@@ -25,6 +25,14 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Recreate Modern Android v2 Structure
+        run: |
+          rm -rf android
+          flutter create . --org com.lifeeasy --platforms android
+          sed -i 's/<uses-permission android:name="android.permission.INTERNET"\/>//g' android/app/src/main/AndroidManifest.xml
+          sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/>\n    <application/' android/app/src/main/AndroidManifest.xml
+          sed -i 's/android:label="lifeeasy_ai"/android:label="LifeEasy AI"/g' android/app/src/main/AndroidManifest.xml
+
       - name: Get dependencies
         run: flutter pub get
 
