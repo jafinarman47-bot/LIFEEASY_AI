@@ -42,41 +42,41 @@ jobs:
           if [ -f "$STT_GRADLE" ]; then
             echo "Rewriting speech_to_text build.gradle completely..."
             cat << 'EOF' > "$STT_GRADLE"
-            group 'com.surialagan.speechtotext'
-            version '1.0-SNAPSHOT'
+group 'com.surialagan.speechtotext'
+version '1.0-SNAPSHOT'
 
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:8.1.0'
-                }
-            }
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+    }
+}
 
-            allprojects {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-            }
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 
-            apply plugin: 'com.android.library'
+apply plugin: 'com.android.library'
 
-            android {
-                namespace 'com.surialagan.speechtotext'
-                compileSdk 34
+android {
+    namespace 'com.surialagan.speechtotext'
+    compileSdk 34
 
-                defaultConfig {
-                    minSdk 21
-                    targetSdk 34
-                }
-                lintOptions {
-                    disable 'InvalidPackage'
-                }
-            }
-            EOF
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+EOF
             echo "speech_to_text successfully patched!"
           else
             echo "Warning: speech_to_text build.gradle not found, but continuing..."
