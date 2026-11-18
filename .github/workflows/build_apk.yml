@@ -33,17 +33,21 @@ jobs:
           sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/>\n    <application/' android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label="lifeeasy_ai"/android:label="LifeEasy AI"/g' android/app/src/main/AndroidManifest.xml
 
+      - name: Get dependencies
+        run: flutter pub get
+
       - name: Fix speech_to_text plugin compatibility
         run: |
           STT_GRADLE="$HOME/.pub-cache/hosted/pub.dev/speech_to_text-7.4.0/android/build.gradle"
           if [ -f "$STT_GRADLE" ]; then
-            echo "Fixing speech_to_text build.gradle..."
-            sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' "$STT_GRADLE"
-            sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' "$STT_GRADLE"
+            echo "Applying patch to speech_to_text build.gradle..."
+            # Apply group and namespace/compileSdk fixes directly
+            sed -i "s/flutter\.compileSdkVersion/34/g" "$STT_GRADLE"
+            sed -i "s/flutter\.minSdkVersion/21/g" "$STT_GRADLE"
+            sed -i "s/flutter\.targetSdkVersion/34/g" "$STT_GRADLE"
+          else
+            echo "speech_to_text build.gradle not found at expected path!"
           fi
-
-      - name: Get dependencies
-        run: flutter pub get
 
       - name: Build release APK
         run: flutter build apk --release --split-per-abi
