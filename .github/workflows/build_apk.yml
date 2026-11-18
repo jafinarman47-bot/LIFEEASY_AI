@@ -41,42 +41,7 @@ jobs:
           STT_GRADLE="$HOME/.pub-cache/hosted/pub.dev/speech_to_text-7.4.0/android/build.gradle"
           if [ -f "$STT_GRADLE" ]; then
             echo "Rewriting speech_to_text build.gradle completely..."
-            cat << 'EOF' > "$STT_GRADLE"
-group 'com.surialagan.speechtotext'
-version '1.0-SNAPSHOT'
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-apply plugin: 'com.android.library'
-
-android {
-    namespace 'com.surialagan.speechtotext'
-    compileSdk 34
-
-    defaultConfig {
-        minSdk 21
-        targetSdk 34
-    }
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-}
-EOF
+            printf "group 'com.surialagan.speechtotext'\nversion '1.0-SNAPSHOT'\n\nbuildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n        classpath 'com.android.tools.build:gradle:8.1.0'\n    }\n}\n\nallprojects {\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\n\napply plugin: 'com.android.library'\n\nandroid {\n    namespace 'com.surialagan.speechtotext'\n    compileSdk 34\n\n    defaultConfig {\n        minSdk 21\n        targetSdk 34\n    }\n    lintOptions {\n        disable 'InvalidPackage'\n    }\n}\n" > "$STT_GRADLE"
             echo "speech_to_text successfully patched!"
           else
             echo "Warning: speech_to_text build.gradle not found, but continuing..."
